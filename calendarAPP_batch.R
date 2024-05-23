@@ -62,7 +62,6 @@ tablones<-function(julian_days,nametag,estacion, crop, serie,outfolder, fase){
   # Extract quantile values for von Mises in Julian days
   quantiles_vonmises <- qvonmises(c(0.33, 0.66), mu = fit_vonmises$mu, kappa = fit_vonmises$kappa)
   quantile_df_vonmises <- data.frame(Quantile = c(0.33, 0.66), Julian = (quantiles_vonmises / (2 * pi)) * 365)
-  
   # Fit the Gaussian distribution using fitdistrplus
   fit_gaussian <- fitdist(julian_days, 'norm')
   
@@ -96,7 +95,7 @@ tablones<-function(julian_days,nametag,estacion, crop, serie,outfolder, fase){
     #theme(legend.position = 'bottom', legend.text = element_text(size=12))+
     theme(axis.text.x = element_text(size= 12, hjust = 1), axis.title = element_blank())+
     theme(axis.text.y = element_text(size= 12, hjust = 1), axis.title = element_blank())+
-    theme(plot.title = element_text(hjust = 0.5, size = 14))+
+    theme(plot.title = element_text(hjust = 0.5, size = 13))+
     ggtitle(paste0(estacion,'. ', crop,'. ', fase))
   if(fase == 'Cessation'){fuse = 'cessation'};if(fase == 'Onset'){fuse = 'Onset'}
   ggsave(paste0(outfolder,'/',serie,'_',crop,'_',fase,'.jpg'),p,width = 4, height = 5)  
@@ -170,7 +169,7 @@ calendator<-function(
   
   k<-read_table(station,col_names = FALSE, na ='-99.9') %>% 
     rename('Year'=1,'Month'=2,'Day'=3,'RR'=4,'TX'=5,'TN'=6) %>% dplyr::select(-TX,-TN) %>%
-    mutate(RRS = zoo::rollsum(RR, mjours, align = "right", fill = 0)) %>% mutate(Seche = ifelse(RR <= seche, 1,0)) %>% 
+    mutate(RRS = zoo::rollsum(RR, yjours, align = "right", fill = 0)) %>% mutate(Seche = ifelse(RR <= seche, 1,0)) %>% 
     mutate(row_id = row_number()) %>% mutate(Date = ymd(paste(Year,Month,Day,sep='-'))) %>% filter(!is.na(Date)) %>%
     mutate(Pendant = rollapply(Seche, width = pendant, FUN = max_racha_posterior, align = "left", partial = TRUE)) %>%
     mutate(Starts = ifelse(RRS > xmm & Pendant <= mjours & (Month > monset | Month == monset & Day >= donset) ,1,0)) %>%
@@ -185,7 +184,7 @@ calendator<-function(
   
   
   #julian_days,nametag,estacion, crop, serie,outfolder, fase
-    ajuste<-tablones(season$JulianO,estacion = estacion, crop = crop, serie = serie, outfolder = outfolder, fase = 'Onset')
+  ajuste<-tablones(season$JulianO,estacion = estacion, crop = crop, serie = serie, outfolder = outfolder, fase = 'Onset')
     inicio<-ajuste$tablon
     
     fitonset<-ajuste$tablon  %>% slice(distro) %>% 
@@ -266,7 +265,7 @@ fitcesation<-fitcesation %>% as_tibble() %>% mutate(value = ifelse(value > 366, 
   imp.dates[fonsi]<-'Onset Starter'
   consi<-yday(format(as.Date(paste0(fcesat, "%y-%m-%d"))))
   imp.dates[consi]<-'Cessation Starter'
-  imp.dates[max(fonsi+1,fitonset[1])]<-'First Onset'
+  imp.dates[fitonset[1]]<-'First Onset'
   imp.dates[fitonset[2]]<-'Normal Onset'
   imp.dates[fitonset[3]]<-'Late Onset'
   imp.dates[fitonset[4]]<-'Last Onset'
@@ -509,18 +508,18 @@ server <- function(input, output, session) {
           kaka <- calendator(
             infolder = input$infolder,
             outfolder = input$outfolder,
-            seche = iter$seche[i],
-            xmm = iter$xmm[i],
-            monset = iter$monset[i],
-            donset = iter$donset[i],
-            yjours = iter$yjours[i],
-            mjours = iter$mjours[i],
-            pendant = iter$pendant[i],
-            moces = iter$moces[i],
-            doces = iter$doces[i],
-            ymm = iter$ymm[i],
-            endjours = iter$endjours[i],
-            ciclo = iter$ciclo[i],
+            seche = as.numeric(iter$seche[i]),
+            xmm = as.numeric(iter$xmm[i]),
+            monset = as.numeric(iter$monset[i]),
+            donset = as.numeric(iter$donset[i]),
+            yjours = as.numeric(iter$yjours[i]),
+            mjours = as.numeric(iter$mjours[i]),
+            pendant = as.numeric(iter$pendant[i]),
+            moces = as.numeric(iter$moces[i]),
+            doces = as.numeric(iter$doces[i]),
+            ymm = as.numeric(iter$ymm[i]),
+            endjours =as.numeric(iter$endjours[i]),
+            ciclo = as.numeric(iter$ciclo[i]),
             serie = iter$serie[i],
             calendaryear = input$calendaryear,
             distro = iter$distro[i],
