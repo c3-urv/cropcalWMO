@@ -1,11 +1,14 @@
 https://github.com/c3-urv/cropcalWMO
 https://github.com/c3-urv/cropcalWMO/releases/tag/v1.0 
 
+Created by: Aguilar Enric, Boqué Anna, Cimolai Caterina, Olano Jon
+
 CC BY-NC 4.0 Deed
 Attribution-NonCommercial 4.0 International 
 
 https://creativecommons.org/licenses/by-nc/4.0
 https://creativecommons.org/licenses/by-nc/4.0/legalcode.en
+
 
 
 You are free to:
